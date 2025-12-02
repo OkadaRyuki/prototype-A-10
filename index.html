@@ -71,6 +71,19 @@
             // ユーザー名をlocalStorageに保存
             localStorage.setItem('username', username);
             localStorage.setItem('accountName', accountName);
+
+            // プロフィール情報にもユーザーネームを反映
+            const rawProfile = localStorage.getItem('userProfile');
+            let profile = {};
+            if (rawProfile) {
+                try {
+                    profile = JSON.parse(rawProfile);
+                } catch (e) {
+                    profile = {};
+                }
+            }
+            profile.username = username;
+            localStorage.setItem('userProfile', JSON.stringify(profile));
             
             // ログイン成功後、button1.htmlにリダイレクト
             window.location.href = 'button1.html';

@@ -25,11 +25,39 @@
     </footer>
     
     <script>
-        // ユーザー名を表示
-        const username = localStorage.getItem('username');
-        if (username) {
-            document.getElementById('userNameDisplay').textContent = username;
+        function getUserProfile() {
+            const storedUsername = localStorage.getItem('username') || '';
+            const raw = localStorage.getItem('userProfile');
+            let profile = { username: storedUsername, gender: '', birthdate: '', hobbies: [], icon: '' };
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    profile = { ...profile, ...parsed };
+                } catch (e) {}
+            }
+            if (!profile.username && storedUsername) profile.username = storedUsername;
+            return profile;
         }
+
+        function applyHeaderProfile() {
+            const el = document.getElementById('userNameDisplay');
+            if (!el) return;
+
+            const profile = getUserProfile();
+            if (!profile.username) {
+                el.textContent = '';
+                return;
+            }
+
+            const iconHtml = profile.icon ? `<span class="user-icon">${profile.icon}</span>` : '';
+            el.innerHTML =
+                `<span class="user-name-content">` +
+                iconHtml +
+                `<span class="user-name-text">${profile.username}</span>` +
+                `</span>`;
+        }
+
+        applyHeaderProfile();
     </script>
 </body>
 </html>

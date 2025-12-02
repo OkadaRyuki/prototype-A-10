@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トークルーム</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>A10プロトタイプ</h1>
+        <div class="user-name" id="userNameDisplay"></div>
+    </header>
+
+    <main>
+        <section class="chat-header">
+            <h2 id="roomTitle">トークルーム</h2>
+            <p id="roomSummary" class="chat-room-summary"></p>
+        </section>
+
+        <section class="chat-container">
+            <div id="messages" class="chat-messages"></div>
+            <form id="chatForm" class="chat-form">
+                <input
+                    type="text"
+                    id="messageInput"
+                    class="chat-input"
+                    placeholder="メッセージを入力して Enter で送信"
+                    autocomplete="off"
+                    required
+                />
+                <button type="submit" class="chat-send-button">送信</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <a href="button1.html" class="footer-btn">ボタン1</a>
+        <a href="button2.html" class="footer-btn">ボタン2</a>
+        <a href="team.html" class="footer-btn team-btn">👥</a>
+        <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
+    </footer>
+
+    <script>
+        function getUserProfile() {
+            const storedUsername = localStorage.getItem('username') || '';
+            const raw = localStorage.getItem('userProfile');
+            let profile = { username: storedUsername, gender: '', birthdate: '', hobbies: [], icon: '' };
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    profile = { ...profile, ...parsed };
+                } catch (e) {}
+            }
+            if (!profile.username && storedUsername) profile.username = storedUsername;
+            return profile;
+        }
+
+        function applyHeaderProfile() {
+            const el = document.getElementById('userNameDisplay');
+            if (!el) return;
+
+            const profile = getUserProfile();
+            if (!profile.username) {
+                el.textContent = '';
+                return;
+            }
+
+            const iconHtml = profile.icon ? `<span class="user-icon">${profile.icon}</span>` : '';
+            el.innerHTML =
+                `<span class="user-name-content">` +
+                iconHtml +
+                `<span class="user-name-text">${profile.username}</span>` +
+                `</span>`;
+        }
+
+        applyHeaderProfile();
+
+        const username = localStorage.getItem('username');
+
+        const roomsKey = 'talkRooms';
+
+        function loadRooms() {
+            const raw = localStorage.getItem(roomsKey);
+            if (!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch {
+                return [];
+            }
+        }
+
+        const currentRoomId = localStorage.getItem('currentRoomId');
+        const rooms = loadRooms();
+        const currentRoom = rooms.find((r) => r.id === currentRoomId);
+
+        const roomTitle = document.getElementById('roomTitle');
+        const roomSummary = document.getElementById('roomSummary');
+
+        if (currentRoom) {
+            roomTitle.textContent = currentRoom.name;
+            roomSummary.textContent = currentRoom.summary || 'この部屋の概要はまだありません。';
+        } else {
+            roomTitle.textContent = '部屋が見つかりません';
+            roomSummary.textContent = 'チームページから部屋を選択してください。';
+        }
+
+        // メッセージの読み書き
+        function getMessagesKey(roomId) {
+            return 'messages_' + roomId;
+        }
+
+        function loadMessages(roomId) {
+            if (!roomId) return [];
+            const raw = localStorage.getItem(getMessagesKey(roomId));
+            if (!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch {
+                return [];
+            }
+        }
+
+        function saveMessages(roomId, messages) {
+            if (!roomId) return;
+            localStorage.setItem(getMessagesKey(roomId), JSON.stringify(messages));
+        }
+
+        const messagesContainer = document.getElementById('messages');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+
+        function renderMessages() {
+            const msgs = loadMessages(currentRoomId);
+            messagesContainer.innerHTML = '';
+            msgs.forEach((m) => {
+                const item = document.createElement('div');
+                item.className = 'chat-message';
+                const namePart = m.user ? m.user + '：' : '';
+                item.textContent = namePart + m.text;
+                messagesContainer.appendChild(item);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        if (!currentRoom) {
+            chatForm.style.display = 'none';
+        } else {
+            chatForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const text = messageInput.value.trim();
+                if (!text) return;
+
+                const msgs = loadMessages(currentRoomId);
+                msgs.push({
+                    text,
+                    user: username || '匿名',
+                    ts: Date.now(),
+                });
+                saveMessages(currentRoomId, msgs);
+                messageInput.value = '';
+                renderMessages();
+            });
+        }
+
+        renderMessages();
+    </script>
+</body>
+</html>
+
+

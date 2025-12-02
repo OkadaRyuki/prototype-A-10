@@ -13,8 +13,57 @@
     </header>
     
     <main>
-        <h1>設定ページ</h1>
-        <p>これは設定のページです。</p>
+        <div class="settings-container">
+            <h1>設定</h1>
+
+            <form id="settingsForm" class="settings-form">
+                <div class="settings-section">
+                    <div class="settings-section-title">ユーザーネーム</div>
+                    <label for="displayName">表示名</label>
+                    <input type="text" id="displayName" placeholder="表示したい名前を入力">
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">性別</div>
+                    <div class="gender-options">
+                        <label><input type="radio" name="gender" value="male"> 男性</label>
+                        <label><input type="radio" name="gender" value="female"> 女性</label>
+                        <label><input type="radio" name="gender" value="other"> その他</label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">生年月日</div>
+                    <label for="birthdate">生年月日</label>
+                    <input type="date" id="birthdate">
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">趣味</div>
+                    <div class="choice-buttons" id="hobbyButtons">
+                        <button type="button" class="choice-button" data-hobby="sports">スポーツ</button>
+                        <button type="button" class="choice-button" data-hobby="games">ゲーム</button>
+                        <button type="button" class="choice-button" data-hobby="music">音楽</button>
+                        <button type="button" class="choice-button" data-hobby="reading">読書</button>
+                        <button type="button" class="choice-button" data-hobby="travel">旅行</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">アイコン</div>
+                    <div class="choice-buttons" id="iconButtons">
+                        <button type="button" class="icon-choice-button" data-icon="😀">😀</button>
+                        <button type="button" class="icon-choice-button" data-icon="😄">😄</button>
+                        <button type="button" class="icon-choice-button" data-icon="😎">😎</button>
+                        <button type="button" class="icon-choice-button" data-icon="🐱">🐱</button>
+                        <button type="button" class="icon-choice-button" data-icon="🌟">🌟</button>
+                    </div>
+                    <p class="settings-note">※ 選択したアイコンは、ヘッダーのユーザーネームの横に表示されます。</p>
+                </div>
+
+                <button type="submit" class="settings-save-button">保存</button>
+            </form>
+        </div>
     </main>
     
     <footer>
@@ -25,11 +74,154 @@
     </footer>
     
     <script>
-        // ユーザー名を表示
-        const username = localStorage.getItem('username');
-        if (username) {
-            document.getElementById('userNameDisplay').textContent = username;
+        function getUserProfile() {
+            const storedUsername = localStorage.getItem('username') || '';
+            const raw = localStorage.getItem('userProfile');
+            let profile = {
+                username: storedUsername,
+                gender: '',
+                birthdate: '',
+                hobbies: [],
+                icon: ''
+            };
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    profile = { ...profile, ...parsed };
+                } catch (e) {
+                    // ignore parse error
+                }
+            }
+            if (!profile.username && storedUsername) {
+                profile.username = storedUsername;
+            }
+            return profile;
         }
+
+        function saveUserProfile(profile) {
+            localStorage.setItem('userProfile', JSON.stringify(profile));
+            if (profile.username) {
+                localStorage.setItem('username', profile.username);
+            }
+        }
+
+        function applyHeaderProfile() {
+            const el = document.getElementById('userNameDisplay');
+            if (!el) return;
+
+            const profile = getUserProfile();
+            if (!profile.username) {
+                el.textContent = '';
+                return;
+            }
+
+            const iconHtml = profile.icon
+                ? `<span class="user-icon">${profile.icon}</span>`
+                : '';
+
+            el.innerHTML =
+                `<span class="user-name-content">` +
+                iconHtml +
+                `<span class="user-name-text">${profile.username}</span>` +
+                `</span>`;
+        }
+
+        // 設定フォームの制御
+        const settingsForm = document.getElementById('settingsForm');
+        const displayNameInput = document.getElementById('displayName');
+        const birthdateInput = document.getElementById('birthdate');
+        const hobbyButtons = document.querySelectorAll('#hobbyButtons .choice-button');
+        const iconButtons = document.querySelectorAll('#iconButtons .icon-choice-button');
+
+        function loadFormFromProfile() {
+            const profile = getUserProfile();
+
+            displayNameInput.value = profile.username || '';
+            if (profile.birthdate) {
+                birthdateInput.value = profile.birthdate;
+            }
+
+            if (profile.gender) {
+                const genderRadio = document.querySelector(`input[name="gender"][value="${profile.gender}"]`);
+                if (genderRadio) {
+                    genderRadio.checked = true;
+                }
+            }
+
+            if (Array.isArray(profile.hobbies)) {
+                hobbyButtons.forEach((btn) => {
+                    const hobby = btn.getAttribute('data-hobby');
+                    if (profile.hobbies.includes(hobby)) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            }
+
+            if (profile.icon) {
+                iconButtons.forEach((btn) => {
+                    if (btn.getAttribute('data-icon') === profile.icon) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                });
+            }
+        }
+
+        hobbyButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('selected');
+            });
+        });
+
+        iconButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                iconButtons.forEach((b) => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const profile = getUserProfile();
+
+            const username = displayNameInput.value.trim();
+            if (username) {
+                profile.username = username;
+            }
+
+            const genderRadio = document.querySelector('input[name="gender"]:checked');
+            profile.gender = genderRadio ? genderRadio.value : '';
+
+            profile.birthdate = birthdateInput.value || '';
+
+            const selectedHobbies = [];
+            hobbyButtons.forEach((btn) => {
+                if (btn.classList.contains('selected')) {
+                    selectedHobbies.push(btn.getAttribute('data-hobby'));
+                }
+            });
+            profile.hobbies = selectedHobbies;
+
+            let selectedIcon = '';
+            iconButtons.forEach((btn) => {
+                if (btn.classList.contains('selected')) {
+                    selectedIcon = btn.getAttribute('data-icon');
+                }
+            });
+            profile.icon = selectedIcon;
+
+            saveUserProfile(profile);
+            applyHeaderProfile();
+            alert('設定を保存しました。');
+        });
+
+        // 初期表示
+        loadFormFromProfile();
+        applyHeaderProfile();
     </script>
 </body>
 </html>

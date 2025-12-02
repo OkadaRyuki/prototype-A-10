@@ -11,25 +11,161 @@
         <h1>A10プロトタイプ</h1>
         <div class="user-name" id="userNameDisplay"></div>
     </header>
-    
+
     <main>
         <h1>チームページ</h1>
-        <p>これはチームのページです。</p>
+        <p>相談部屋を作成して、チームでトークできます。</p>
+
+        <div id="roomsContainer" class="rooms-container"></div>
+
+        <!-- 相談部屋追加用の円形ボタン -->
+        <button id="addRoomButton" class="floating-add-button">+</button>
+
+        <!-- 部屋追加用フォーム（モーダル） -->
+        <div id="roomFormOverlay" class="room-form-overlay hidden">
+            <div class="room-form">
+                <h2>追加したい部屋の名前は？</h2>
+                <p class="room-form-description">相談部屋の名前と大まかな概要を入力してください。</p>
+
+                <label for="roomName">部屋の名前</label>
+                <input type="text" id="roomName" placeholder="例）進路相談ルーム">
+
+                <label for="roomSummary">概要</label>
+                <textarea id="roomSummary" rows="3" placeholder="例）就職活動や進学について相談する部屋"></textarea>
+
+                <div class="room-form-buttons">
+                    <button id="cancelRoomButton" class="room-cancel-button">キャンセル</button>
+                    <button id="saveRoomButton" class="room-save-button">追加</button>
+                </div>
+            </div>
+        </div>
     </main>
-    
+
     <footer>
         <a href="button1.html" class="footer-btn">ボタン1</a>
         <a href="button2.html" class="footer-btn">ボタン2</a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
-    
+
     <script>
-        // ユーザー名を表示
-        const username = localStorage.getItem('username');
-        if (username) {
-            document.getElementById('userNameDisplay').textContent = username;
+        function getUserProfile() {
+            const storedUsername = localStorage.getItem('username') || '';
+            const raw = localStorage.getItem('userProfile');
+            let profile = { username: storedUsername, gender: '', birthdate: '', hobbies: [], icon: '' };
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    profile = { ...profile, ...parsed };
+                } catch (e) {}
+            }
+            if (!profile.username && storedUsername) profile.username = storedUsername;
+            return profile;
         }
+
+        function applyHeaderProfile() {
+            const el = document.getElementById('userNameDisplay');
+            if (!el) return;
+
+            const profile = getUserProfile();
+            if (!profile.username) {
+                el.textContent = '';
+                return;
+            }
+
+            const iconHtml = profile.icon ? `<span class="user-icon">${profile.icon}</span>` : '';
+            el.innerHTML =
+                `<span class="user-name-content">` +
+                iconHtml +
+                `<span class="user-name-text">${profile.username}</span>` +
+                `</span>`;
+        }
+
+        applyHeaderProfile();
+
+        // 部屋データの読み込み・保存
+        const roomsKey = 'talkRooms';
+
+        function loadRooms() {
+            const raw = localStorage.getItem(roomsKey);
+            if (!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch {
+                return [];
+            }
+        }
+
+        function saveRooms(rooms) {
+            localStorage.setItem(roomsKey, JSON.stringify(rooms));
+        }
+
+        function renderRooms() {
+            const container = document.getElementById('roomsContainer');
+            const rooms = loadRooms();
+            container.innerHTML = '';
+
+            rooms.forEach((room) => {
+                const card = document.createElement('div');
+                card.className = 'room-card';
+                card.innerHTML = `
+                    <h3 class="room-title">${room.name}</h3>
+                    <p class="room-summary">${room.summary}</p>
+                `;
+                card.addEventListener('click', () => {
+                    localStorage.setItem('currentRoomId', room.id);
+                    window.location.href = 'talk.html';
+                });
+                container.appendChild(card);
+            });
+        }
+
+        // 円形ボタンとフォームの制御
+        const addRoomButton = document.getElementById('addRoomButton');
+        const roomFormOverlay = document.getElementById('roomFormOverlay');
+        const cancelRoomButton = document.getElementById('cancelRoomButton');
+        const saveRoomButton = document.getElementById('saveRoomButton');
+        const roomNameInput = document.getElementById('roomName');
+        const roomSummaryInput = document.getElementById('roomSummary');
+
+        function openRoomForm() {
+            roomNameInput.value = '';
+            roomSummaryInput.value = '';
+            roomFormOverlay.classList.remove('hidden');
+        }
+
+        function closeRoomForm() {
+            roomFormOverlay.classList.add('hidden');
+        }
+
+        addRoomButton.addEventListener('click', openRoomForm);
+        cancelRoomButton.addEventListener('click', closeRoomForm);
+        roomFormOverlay.addEventListener('click', (e) => {
+            if (e.target === roomFormOverlay) {
+                closeRoomForm();
+            }
+        });
+
+        saveRoomButton.addEventListener('click', () => {
+            const name = roomNameInput.value.trim();
+            const summary = roomSummaryInput.value.trim();
+
+            if (!name) {
+                alert('部屋の名前を入力してください。');
+                return;
+            }
+
+            const rooms = loadRooms();
+            const id = `room_${Date.now()}`;
+            rooms.unshift({ id, name, summary }); // 上から順に追加
+            saveRooms(rooms);
+
+            closeRoomForm();
+            renderRooms();
+        });
+
+        // 初期表示
+        renderRooms();
     </script>
 </body>
 </html>
