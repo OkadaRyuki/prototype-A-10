@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>A10プロトタイプ</h1>
+    </header>
+    
+    <main>
+        <div class="login-container">
+            <h1>ログイン</h1>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="accountName">アカウント名</label>
+                    <input 
+                        type="text" 
+                        id="accountName" 
+                        name="accountName" 
+                        placeholder="username@ccmailg.meijo-u.ac.jp"
+                        required
+                    >
+                    <div id="errorMessage" class="error-message"></div>
+                </div>
+                <button type="submit" class="login-btn">ログイン</button>
+            </form>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <h2>ログイン成功</h2>
+                <p>ユーザー名: <span id="username"></span></p>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const userInfo = document.getElementById('userInfo');
+        const usernameSpan = document.getElementById('username');
+        
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const accountName = document.getElementById('accountName').value.trim();
+            const requiredSuffix = '@ccmailg.meijo-u.ac.jp';
+            
+            // エラーメッセージをクリア
+            errorMessage.textContent = '';
+            errorMessage.style.display = 'none';
+            userInfo.style.display = 'none';
+            
+            // 末尾が@ccmailg.meijo-u.ac.jpで終わるかチェック
+            if (!accountName.endsWith(requiredSuffix)) {
+                errorMessage.textContent = 'アカウント名は@ccmailg.meijo-u.ac.jpで終わる必要があります。';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // 末尾を除いた部分をユーザー名として設定
+            const username = accountName.slice(0, -requiredSuffix.length);
+            
+            if (username.length === 0) {
+                errorMessage.textContent = 'ユーザー名が空です。';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // ユーザー名をlocalStorageに保存
+            localStorage.setItem('username', username);
+            localStorage.setItem('accountName', accountName);
+            
+            // ログイン成功後、button1.htmlにリダイレクト
+            window.location.href = 'button1.html';
+        });
+    </script>
+</body>
+</html>
+
