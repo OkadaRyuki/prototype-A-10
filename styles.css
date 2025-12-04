@@ -12,7 +12,7 @@ body {
 }
 
 header {
-    background-color: green;
+    background: linear-gradient(135deg, #ff9ec7, #ff6bb3, #ff4da6);
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -72,7 +72,7 @@ footer {
     background-color: white;
     color: #333;
     border: none;
-    padding: 20px;
+    padding: 12px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
@@ -151,8 +151,8 @@ footer {
 }
 
 .login-btn {
-    background-color: green;
-    color: white;
+    background-color: #b3e5fc;
+    color: #333;
     padding: 12px 24px;
     border: none;
     border-radius: 4px;
@@ -163,11 +163,11 @@ footer {
 }
 
 .login-btn:hover {
-    background-color: #006600;
+    background-color: #81d4fa;
 }
 
 .login-btn:active {
-    background-color: #004d00;
+    background-color: #4fc3f7;
 }
 
 .user-info {
@@ -222,18 +222,27 @@ footer {
 }
 
 .settings-form input[type="text"],
-.settings-form input[type="date"] {
+.settings-form input[type="date"],
+.settings-form select,
+.settings-form textarea {
     width: 100%;
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 14px;
     margin-bottom: 12px;
+    font-family: Arial, sans-serif;
 }
 
-.settings-form input:focus {
+.settings-form input:focus,
+.settings-form select:focus,
+.settings-form textarea:focus {
     outline: none;
     border-color: green;
+}
+
+.settings-form textarea {
+    resize: vertical;
 }
 
 .gender-options {
@@ -523,4 +532,97 @@ footer {
 .chat-send-button:hover {
     background-color: #006600;
 }
+
+/* ユーザー一覧ページ用スタイル */
+.users-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 20px 0;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.user-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.user-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.user-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.user-card-icon {
+    font-size: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+}
+
+.user-card-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.user-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-card-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-card-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #666;
+}
+
+.user-card-value {
+    font-size: 14px;
+    color: #333;
+}
+
+.user-card-introduction {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+/* スマホサイズ対応 */
+@media (max-width: 480px) {
+    .users-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
 

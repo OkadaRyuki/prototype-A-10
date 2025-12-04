@@ -39,6 +39,27 @@
                 </div>
 
                 <div class="settings-section">
+                    <div class="settings-section-title">学部</div>
+                    <label for="department">学部</label>
+                    <select id="department" class="settings-form">
+                        <option value="">選択してください</option>
+                        <option value="法学部">法学部</option>
+                        <option value="経済学部">経済学部</option>
+                        <option value="経営学部">経営学部</option>
+                        <option value="理工学部">理工学部</option>
+                        <option value="情報工学部">情報工学部</option>
+                        <option value="ひみつ">ひみつ</option>
+                    </select>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">自己紹介</div>
+                    <label for="selfIntroduction">自己紹介（100文字程度）</label>
+                    <textarea id="selfIntroduction" class="settings-form" rows="4" maxlength="100" placeholder="自己紹介を入力してください（100文字まで）"></textarea>
+                    <p class="settings-note">※ 100文字まで入力可能です。</p>
+                </div>
+
+                <div class="settings-section">
                     <div class="settings-section-title">趣味</div>
                     <div class="choice-buttons" id="hobbyButtons">
                         <button type="button" class="choice-button" data-hobby="sports">スポーツ</button>
@@ -52,11 +73,11 @@
                 <div class="settings-section">
                     <div class="settings-section-title">アイコン</div>
                     <div class="choice-buttons" id="iconButtons">
-                        <button type="button" class="icon-choice-button" data-icon="😀">😀</button>
-                        <button type="button" class="icon-choice-button" data-icon="😄">😄</button>
-                        <button type="button" class="icon-choice-button" data-icon="😎">😎</button>
-                        <button type="button" class="icon-choice-button" data-icon="🐱">🐱</button>
-                        <button type="button" class="icon-choice-button" data-icon="🌟">🌟</button>
+                        <button type="button" class="icon-choice-button" data-icon="●">●</button>
+                        <button type="button" class="icon-choice-button" data-icon="■">■</button>
+                        <button type="button" class="icon-choice-button" data-icon="▲">▲</button>
+                        <button type="button" class="icon-choice-button" data-icon="◆">◆</button>
+                        <button type="button" class="icon-choice-button" data-icon="★">★</button>
                     </div>
                     <p class="settings-note">※ 選択したアイコンは、ヘッダーのユーザーネームの横に表示されます。</p>
                 </div>
@@ -81,6 +102,8 @@
                 username: storedUsername,
                 gender: '',
                 birthdate: '',
+                department: '',
+                selfIntroduction: '',
                 hobbies: [],
                 icon: ''
             };
@@ -98,10 +121,37 @@
             return profile;
         }
 
+        function getAllUsers() {
+            const raw = localStorage.getItem('allUsers');
+            if (!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveAllUsers(users) {
+            localStorage.setItem('allUsers', JSON.stringify(users));
+        }
+
+        function addOrUpdateUserInList(profile) {
+            if (!profile.username) return;
+            const allUsers = getAllUsers();
+            const existingIndex = allUsers.findIndex(u => u.username === profile.username);
+            if (existingIndex >= 0) {
+                allUsers[existingIndex] = { ...allUsers[existingIndex], ...profile };
+            } else {
+                allUsers.push({ ...profile });
+            }
+            saveAllUsers(allUsers);
+        }
+
         function saveUserProfile(profile) {
             localStorage.setItem('userProfile', JSON.stringify(profile));
             if (profile.username) {
                 localStorage.setItem('username', profile.username);
+                addOrUpdateUserInList(profile);
             }
         }
 
@@ -130,6 +180,8 @@
         const settingsForm = document.getElementById('settingsForm');
         const displayNameInput = document.getElementById('displayName');
         const birthdateInput = document.getElementById('birthdate');
+        const departmentSelect = document.getElementById('department');
+        const selfIntroductionTextarea = document.getElementById('selfIntroduction');
         const hobbyButtons = document.querySelectorAll('#hobbyButtons .choice-button');
         const iconButtons = document.querySelectorAll('#iconButtons .icon-choice-button');
 
@@ -139,6 +191,12 @@
             displayNameInput.value = profile.username || '';
             if (profile.birthdate) {
                 birthdateInput.value = profile.birthdate;
+            }
+            if (profile.department) {
+                departmentSelect.value = profile.department;
+            }
+            if (profile.selfIntroduction) {
+                selfIntroductionTextarea.value = profile.selfIntroduction;
             }
 
             if (profile.gender) {
@@ -197,6 +255,8 @@
             profile.gender = genderRadio ? genderRadio.value : '';
 
             profile.birthdate = birthdateInput.value || '';
+            profile.department = departmentSelect.value || '';
+            profile.selfIntroduction = selfIntroductionTextarea.value.trim() || '';
 
             const selectedHobbies = [];
             hobbyButtons.forEach((btn) => {

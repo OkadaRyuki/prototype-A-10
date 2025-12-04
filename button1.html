@@ -13,8 +13,10 @@
     </header>
     
     <main>
-        <h1>ボタン1のページ</h1>
-        <p>これはボタン1のページです。</p>
+        <h1>ユーザー一覧</h1>
+        <div class="users-container" id="usersContainer">
+            <!-- ユーザーカードがここに動的に追加されます -->
+        </div>
     </main>
     
     <footer>
@@ -58,6 +60,73 @@
         }
 
         applyHeaderProfile();
+
+        // ユーザーリストの表示
+        function getAllUsers() {
+            const raw = localStorage.getItem('allUsers');
+            if (!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getHobbyDisplayName(hobby) {
+            const hobbyMap = {
+                'sports': 'スポーツ',
+                'games': 'ゲーム',
+                'music': '音楽',
+                'reading': '読書',
+                'travel': '旅行'
+            };
+            return hobbyMap[hobby] || hobby;
+        }
+
+        function renderUsers() {
+            const usersContainer = document.getElementById('usersContainer');
+            const users = getAllUsers();
+            
+            if (users.length === 0) {
+                usersContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">登録されたユーザーはいません。</p>';
+                return;
+            }
+
+            usersContainer.innerHTML = users.map(user => {
+                const icon = user.icon || '';
+                const username = user.username || 'ユーザー名不明';
+                const department = user.department || '未設定';
+                const selfIntroduction = user.selfIntroduction || '自己紹介は未設定です。';
+                const hobbies = Array.isArray(user.hobbies) && user.hobbies.length > 0
+                    ? user.hobbies.map(h => getHobbyDisplayName(h)).join('、')
+                    : '未設定';
+
+                return `
+                    <div class="user-card">
+                        <div class="user-card-header">
+                            ${icon ? `<span class="user-card-icon">${icon}</span>` : ''}
+                            <h3 class="user-card-name">${username}</h3>
+                        </div>
+                        <div class="user-card-body">
+                            <div class="user-card-field">
+                                <span class="user-card-label">学部：</span>
+                                <span class="user-card-value">${department}</span>
+                            </div>
+                            <div class="user-card-field">
+                                <span class="user-card-label">自己紹介：</span>
+                                <p class="user-card-introduction">${selfIntroduction}</p>
+                            </div>
+                            <div class="user-card-field">
+                                <span class="user-card-label">趣味：</span>
+                                <span class="user-card-value">${hobbies}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        renderUsers();
     </script>
 </body>
 </html>

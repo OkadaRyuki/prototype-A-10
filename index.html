@@ -85,6 +85,35 @@
             profile.username = username;
             localStorage.setItem('userProfile', JSON.stringify(profile));
             
+            // ユーザーリストに追加
+            function getAllUsers() {
+                const raw = localStorage.getItem('allUsers');
+                if (!raw) return [];
+                try {
+                    return JSON.parse(raw);
+                } catch (e) {
+                    return [];
+                }
+            }
+            
+            function saveAllUsers(users) {
+                localStorage.setItem('allUsers', JSON.stringify(users));
+            }
+            
+            function addOrUpdateUserInList(profile) {
+                if (!profile.username) return;
+                const allUsers = getAllUsers();
+                const existingIndex = allUsers.findIndex(u => u.username === profile.username);
+                if (existingIndex >= 0) {
+                    allUsers[existingIndex] = { ...allUsers[existingIndex], ...profile };
+                } else {
+                    allUsers.push({ ...profile });
+                }
+                saveAllUsers(allUsers);
+            }
+            
+            addOrUpdateUserInList(profile);
+            
             // ログイン成功後、button1.htmlにリダイレクト
             window.location.href = 'button1.html';
         });
