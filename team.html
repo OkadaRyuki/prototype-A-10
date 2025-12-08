@@ -43,7 +43,6 @@
 
     <footer>
         <a href="button1.html" class="footer-btn">ボタン1</a>
-        <a href="button2.html" class="footer-btn">ボタン2</a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -164,7 +163,24 @@
             renderRooms();
         });
 
+        // システム監査技術者試験の部屋を常時表示
+        function ensureSystemAuditRoom() {
+            const rooms = loadRooms();
+            const systemAuditRoomId = 'system_audit_room';
+            const existingRoom = rooms.find(r => r.id === systemAuditRoomId);
+            
+            if (!existingRoom) {
+                rooms.unshift({
+                    id: systemAuditRoomId,
+                    name: 'システム監査技術者試験',
+                    summary: 'システム監査技術者試験について話し合う部屋'
+                });
+                saveRooms(rooms);
+            }
+        }
+
         // 初期表示
+        ensureSystemAuditRoom();
         renderRooms();
     </script>
 </body>

@@ -36,7 +36,6 @@
 
     <footer>
         <a href="button1.html" class="footer-btn">ボタン1</a>
-        <a href="button2.html" class="footer-btn">ボタン2</a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -133,13 +132,30 @@
         function renderMessages() {
             const msgs = loadMessages(currentRoomId);
             messagesContainer.innerHTML = '';
-            msgs.forEach((m) => {
-                const item = document.createElement('div');
-                item.className = 'chat-message';
-                const namePart = m.user ? m.user + '：' : '';
-                item.textContent = namePart + m.text;
-                messagesContainer.appendChild(item);
-            });
+            
+            // システム監査技術者試験の部屋で、メッセージが空の場合、初期メッセージを表示
+            if (currentRoom && currentRoom.id === 'system_audit_room' && msgs.length === 0) {
+                const initialMessage = document.createElement('div');
+                initialMessage.className = 'chat-message-speech-bubble';
+                initialMessage.innerHTML = `
+                    <div class="speech-bubble-container">
+                        <img src="img/marisa.png" alt="魔理沙" class="speech-bubble-icon">
+                        <div class="speech-bubble">
+                            <p>今度の試験いつなのぜ</p>
+                            <p>不安なのぜ</p>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.appendChild(initialMessage);
+            } else {
+                msgs.forEach((m) => {
+                    const item = document.createElement('div');
+                    item.className = 'chat-message';
+                    const namePart = m.user ? m.user + '：' : '';
+                    item.textContent = namePart + m.text;
+                    messagesContainer.appendChild(item);
+                });
+            }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 

@@ -21,7 +21,6 @@
     
     <footer>
         <a href="button1.html" class="footer-btn">ボタン1</a>
-        <a href="button2.html" class="footer-btn">ボタン2</a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -86,6 +85,7 @@
         function renderUsers() {
             const usersContainer = document.getElementById('usersContainer');
             const users = getAllUsers();
+            const currentUser = getUserProfile();
             
             if (users.length === 0) {
                 usersContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">登録されたユーザーはいません。</p>';
@@ -96,30 +96,54 @@
                 const icon = user.icon || '';
                 const username = user.username || 'ユーザー名不明';
                 const department = user.department || '未設定';
-                const selfIntroduction = user.selfIntroduction || '自己紹介は未設定です。';
+                const selfIntroduction = user.selfIntroduction !== undefined && user.selfIntroduction !== null ? user.selfIntroduction : '';
                 const hobbies = Array.isArray(user.hobbies) && user.hobbies.length > 0
                     ? user.hobbies.map(h => getHobbyDisplayName(h)).join('、')
                     : '未設定';
+                const club = user.club || '未設定';
+
+                // 現在のユーザーの場合、トグルがオフの項目を非表示
+                const isCurrentUser = currentUser.username && user.username === currentUser.username;
+                const showDepartment = isCurrentUser ? (user.showDepartment !== false) : true;
+                const showClub = isCurrentUser ? (user.showClub !== false) : true;
+
+                // アイコンの表示（画像パスの場合は<img>タグ、それ以外はテキスト）
+                let iconHtml = '';
+                if (icon) {
+                    if (icon.startsWith('img/') || icon.includes('.png') || icon.includes('.jpg') || icon.includes('.jpeg')) {
+                        iconHtml = `<span class="user-card-icon"><img src="${icon}" alt="アイコン" class="user-card-icon-img"></span>`;
+                    } else {
+                        iconHtml = `<span class="user-card-icon">${icon}</span>`;
+                    }
+                }
 
                 return `
                     <div class="user-card">
                         <div class="user-card-header">
-                            ${icon ? `<span class="user-card-icon">${icon}</span>` : ''}
+                            ${iconHtml}
                             <h3 class="user-card-name">${username}</h3>
                         </div>
                         <div class="user-card-body">
+                            ${showDepartment ? `
                             <div class="user-card-field">
                                 <span class="user-card-label">学部：</span>
                                 <span class="user-card-value">${department}</span>
                             </div>
+                            ` : ''}
                             <div class="user-card-field">
                                 <span class="user-card-label">自己紹介：</span>
-                                <p class="user-card-introduction">${selfIntroduction}</p>
+                                <p class="user-card-introduction">${selfIntroduction || ''}</p>
                             </div>
                             <div class="user-card-field">
                                 <span class="user-card-label">趣味：</span>
                                 <span class="user-card-value">${hobbies}</span>
                             </div>
+                            ${showClub ? `
+                            <div class="user-card-field">
+                                <span class="user-card-label">所属サークル：</span>
+                                <span class="user-card-value">${club}</span>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -127,6 +151,84 @@
         }
 
         renderUsers();
+
+        // 初期ユーザーデータの登録（既に登録されている場合はスキップ）
+        function initializeUsers() {
+            const allUsers = getAllUsers();
+            const existingUsernames = allUsers.map(u => u.username);
+            
+            const initialUsers = [
+                {
+                    username: 'しゃめいまる',
+                    icon: 'img/syameimaru.png',
+                    gender: 'male',
+                    department: '情報工学部',
+                    selfIntroduction: '',
+                    hobbies: [],
+                    club: '軽音部'
+                },
+                {
+                    username: '魔理沙',
+                    icon: 'img/marisa.png',
+                    gender: 'female',
+                    department: '情報工学部',
+                    selfIntroduction: '',
+                    hobbies: [],
+                    club: 'バレーボール部'
+                },
+                {
+                    username: '霊夢',
+                    icon: 'img/reimu.png',
+                    gender: 'female',
+                    department: '情報工学部',
+                    selfIntroduction: '',
+                    hobbies: [],
+                    club: 'なし'
+                },
+                {
+                    username: 'チルノ',
+                    icon: 'img/tiruno.png',
+                    gender: 'female',
+                    department: '情報工学部',
+                    selfIntroduction: '',
+                    hobbies: [],
+                    club: '写真部'
+                },
+                {
+                    username: '高橋',
+                    icon: 'img/takahashi.png',
+                    gender: 'male',
+                    department: '情報工学部',
+                    selfIntroduction: '',
+                    hobbies: [],
+                    club: '情報技術研究会'
+                }
+            ];
+
+            let updated = false;
+            initialUsers.forEach(user => {
+                const existingIndex = allUsers.findIndex(u => u.username === user.username);
+                if (existingIndex >= 0) {
+                    // 既存ユーザーの所属サークルを更新
+                    if (!allUsers[existingIndex].club) {
+                        allUsers[existingIndex].club = user.club;
+                        updated = true;
+                    }
+                } else {
+                    // 新規ユーザーを追加
+                    allUsers.push(user);
+                    updated = true;
+                }
+            });
+
+            if (updated) {
+                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                renderUsers();
+            }
+        }
+
+        // ページ読み込み時に初期ユーザーを登録
+        initializeUsers();
     </script>
 </body>
 </html>

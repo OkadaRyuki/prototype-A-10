@@ -245,6 +245,54 @@ footer {
     resize: vertical;
 }
 
+/* トグルスイッチ付きフィールドのスタイル */
+.settings-field-with-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.settings-field-wrapper {
+    flex: 1;
+}
+
+.settings-field-wrapper label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 24px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    user-select: none;
+}
+
+.radio-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: green;
+}
+
+.radio-option span {
+    line-height: 1.5;
+}
+
 .gender-options {
     display: flex;
     gap: 12px;
@@ -501,6 +549,70 @@ footer {
     font-size: 14px;
 }
 
+/* 吹き出しメッセージのスタイル */
+.chat-message-speech-bubble {
+    margin-bottom: 16px;
+}
+
+.speech-bubble-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.speech-bubble-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.speech-bubble {
+    position: relative;
+    background-color: #ffffff;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 12px 16px;
+    max-width: 70%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 16px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 12px solid #333;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    left: -9px;
+    top: 17px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 11px solid #ffffff;
+}
+
+.speech-bubble p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.speech-bubble p:not(:last-child) {
+    margin-bottom: 4px;
+}
+
 .chat-form {
     display: flex;
     gap: 8px;
@@ -576,6 +688,14 @@ footer {
     width: 32px;
     height: 32px;
     background-color: #f5f5f5;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user-card-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 50%;
 }
 

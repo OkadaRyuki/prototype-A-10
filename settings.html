@@ -40,16 +40,30 @@
 
                 <div class="settings-section">
                     <div class="settings-section-title">学部</div>
-                    <label for="department">学部</label>
-                    <select id="department" class="settings-form">
-                        <option value="">選択してください</option>
-                        <option value="法学部">法学部</option>
-                        <option value="経済学部">経済学部</option>
-                        <option value="経営学部">経営学部</option>
-                        <option value="理工学部">理工学部</option>
-                        <option value="情報工学部">情報工学部</option>
-                        <option value="ひみつ">ひみつ</option>
-                    </select>
+                    <div class="settings-field-with-toggle">
+                        <div class="settings-field-wrapper">
+                            <label for="department">学部</label>
+                            <select id="department" class="settings-form">
+                                <option value="">選択してください</option>
+                                <option value="法学部">法学部</option>
+                                <option value="経済学部">経済学部</option>
+                                <option value="経営学部">経営学部</option>
+                                <option value="理工学部">理工学部</option>
+                                <option value="情報工学部">情報工学部</option>
+                                <option value="ひみつ">ひみつ</option>
+                            </select>
+                        </div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="showDepartment" value="true" id="showDepartmentTrue" checked>
+                                <span>公表</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="showDepartment" value="false" id="showDepartmentFalse">
+                                <span>非公表</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="settings-section">
@@ -67,6 +81,35 @@
                         <button type="button" class="choice-button" data-hobby="music">音楽</button>
                         <button type="button" class="choice-button" data-hobby="reading">読書</button>
                         <button type="button" class="choice-button" data-hobby="travel">旅行</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">所属サークル</div>
+                    <div class="settings-field-with-toggle">
+                        <div class="settings-field-wrapper">
+                            <label for="club">所属サークル</label>
+                            <select id="club" class="settings-form">
+                                <option value="">選択してください</option>
+                                <option value="軽音部">軽音部</option>
+                                <option value="情報技術研究会">情報技術研究会</option>
+                                <option value="バドミントン部">バドミントン部</option>
+                                <option value="バレーボール部">バレーボール部</option>
+                                <option value="写真部">写真部</option>
+                                <option value="e-sports研究会">e-sports研究会</option>
+                                <option value="なし">なし</option>
+                            </select>
+                        </div>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="showClub" value="true" id="showClubTrue" checked>
+                                <span>公表</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="showClub" value="false" id="showClubFalse">
+                                <span>非公表</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -89,7 +132,6 @@
     
     <footer>
         <a href="button1.html" class="footer-btn">ボタン1</a>
-        <a href="button2.html" class="footer-btn">ボタン2</a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -105,6 +147,9 @@
                 department: '',
                 selfIntroduction: '',
                 hobbies: [],
+                club: '',
+                showDepartment: true,
+                showClub: true,
                 icon: ''
             };
             if (raw) {
@@ -182,6 +227,11 @@
         const birthdateInput = document.getElementById('birthdate');
         const departmentSelect = document.getElementById('department');
         const selfIntroductionTextarea = document.getElementById('selfIntroduction');
+        const clubSelect = document.getElementById('club');
+        const showDepartmentTrue = document.getElementById('showDepartmentTrue');
+        const showDepartmentFalse = document.getElementById('showDepartmentFalse');
+        const showClubTrue = document.getElementById('showClubTrue');
+        const showClubFalse = document.getElementById('showClubFalse');
         const hobbyButtons = document.querySelectorAll('#hobbyButtons .choice-button');
         const iconButtons = document.querySelectorAll('#iconButtons .icon-choice-button');
 
@@ -197,6 +247,27 @@
             }
             if (profile.selfIntroduction) {
                 selfIntroductionTextarea.value = profile.selfIntroduction;
+            }
+            if (profile.club) {
+                clubSelect.value = profile.club;
+            }
+            if (profile.showDepartment !== undefined) {
+                if (profile.showDepartment) {
+                    showDepartmentTrue.checked = true;
+                } else {
+                    showDepartmentFalse.checked = true;
+                }
+            } else {
+                showDepartmentTrue.checked = true; // デフォルトはオン
+            }
+            if (profile.showClub !== undefined) {
+                if (profile.showClub) {
+                    showClubTrue.checked = true;
+                } else {
+                    showClubFalse.checked = true;
+                }
+            } else {
+                showClubTrue.checked = true; // デフォルトはオン
             }
 
             if (profile.gender) {
@@ -257,6 +328,9 @@
             profile.birthdate = birthdateInput.value || '';
             profile.department = departmentSelect.value || '';
             profile.selfIntroduction = selfIntroductionTextarea.value.trim() || '';
+            profile.club = clubSelect.value || '';
+            profile.showDepartment = showDepartmentTrue.checked;
+            profile.showClub = showClubTrue.checked;
 
             const selectedHobbies = [];
             hobbyButtons.forEach((btn) => {
