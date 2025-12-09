@@ -826,4 +826,51 @@ footer {
     border-radius: 50%;
 }
 
+/* レスポンシブ調整 */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 20px;
+    }
+    .user-name {
+        padding: 4px 10px;
+        font-size: 14px;
+    }
+    main {
+        padding: 14px;
+    }
+    .footer-btn {
+        padding: 10px;
+    }
+    .footer-btn img {
+        height: 22px;
+    }
+    .events-container {
+        gap: 12px;
+    }
+    .event-card {
+        padding: 14px 14px 40px;
+    }
+    .event-title {
+        font-size: 16px;
+    }
+    .event-description {
+        font-size: 13px;
+    }
+    .event-join-button {
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    .event-participants {
+        right: 10px;
+        bottom: 8px;
+        gap: 3px;
+    }
+    .event-participant-icon {
+        width: 26px;
+        height: 26px;
+    }
+}
+
 
