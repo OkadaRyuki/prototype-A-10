@@ -42,7 +42,8 @@
     </main>
 
     <footer>
-        <a href="button1.html" class="footer-btn">ボタン1</a>
+        <a href="button1.html" class="footer-btn"><img src="img/page1.png" alt="ボタン1"></a>
+        <a href="button2.html" class="footer-btn"><img src="img/page2.png" alt="ボタン2"></a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -62,6 +63,12 @@
             return profile;
         }
 
+        function isProfileComplete(profile) {
+            const username = (profile.username || '').trim();
+            const gender = (profile.gender || '').trim();
+            return !!(username && gender);
+        }
+
         function applyHeaderProfile() {
             const el = document.getElementById('userNameDisplay');
             if (!el) return;
@@ -72,7 +79,12 @@
                 return;
             }
 
-            const iconHtml = profile.icon ? `<span class="user-icon">${profile.icon}</span>` : '';
+            const isImageIcon = profile.icon && (profile.icon.startsWith('img/') || profile.icon.match(/\.(png|jpg|jpeg|gif|webp)$/i));
+            const iconHtml = profile.icon
+                ? (isImageIcon
+                    ? `<img class="user-icon" src="${profile.icon}" alt="ユーザーアイコン">`
+                    : `<span class="user-icon">${profile.icon}</span>`)
+                : '';
             el.innerHTML =
                 `<span class="user-name-content">` +
                 iconHtml +
@@ -80,7 +92,32 @@
                 `</span>`;
         }
 
+        function enforceProfileOrRedirect() {
+            const profile = getUserProfile();
+            if (!isProfileComplete(profile)) {
+                alert('先に設定ページでユーザーネームと性別を保存してください。');
+                window.location.href = 'settings.html';
+            }
+        }
+
+        function attachFooterGuard() {
+            document.querySelectorAll('footer a.footer-btn').forEach((link) => {
+                const href = link.getAttribute('href') || '';
+                if (href === 'settings.html') return;
+                link.addEventListener('click', (e) => {
+                    const profile = getUserProfile();
+                    if (!isProfileComplete(profile)) {
+                        e.preventDefault();
+                        alert('先に設定ページでユーザーネームと性別を保存してください。');
+                        window.location.href = 'settings.html';
+                    }
+                });
+            });
+        }
+
+        enforceProfileOrRedirect();
         applyHeaderProfile();
+        attachFooterGuard();
 
         // 部屋データの読み込み・保存
         const roomsKey = 'talkRooms';

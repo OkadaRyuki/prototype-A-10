@@ -116,11 +116,30 @@
                 <div class="settings-section">
                     <div class="settings-section-title">アイコン</div>
                     <div class="choice-buttons" id="iconButtons">
-                        <button type="button" class="icon-choice-button" data-icon="●">●</button>
-                        <button type="button" class="icon-choice-button" data-icon="■">■</button>
-                        <button type="button" class="icon-choice-button" data-icon="▲">▲</button>
-                        <button type="button" class="icon-choice-button" data-icon="◆">◆</button>
-                        <button type="button" class="icon-choice-button" data-icon="★">★</button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_1.png">
+                            <img src="img/icons/kkrn_icon_user_1.png" alt="アイコン1">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_2.png">
+                            <img src="img/icons/kkrn_icon_user_2.png" alt="アイコン2">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_3.png">
+                            <img src="img/icons/kkrn_icon_user_3.png" alt="アイコン3">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_4.png">
+                            <img src="img/icons/kkrn_icon_user_4.png" alt="アイコン4">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_6.png">
+                            <img src="img/icons/kkrn_icon_user_6.png" alt="アイコン6">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_7.png">
+                            <img src="img/icons/kkrn_icon_user_7.png" alt="アイコン7">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_8.png">
+                            <img src="img/icons/kkrn_icon_user_8.png" alt="アイコン8">
+                        </button>
+                        <button type="button" class="icon-choice-button" data-icon="img/icons/kkrn_icon_user_9.png">
+                            <img src="img/icons/kkrn_icon_user_9.png" alt="アイコン9">
+                        </button>
                     </div>
                     <p class="settings-note">※ 選択したアイコンは、ヘッダーのユーザーネームの横に表示されます。</p>
                 </div>
@@ -131,7 +150,8 @@
     </main>
     
     <footer>
-        <a href="button1.html" class="footer-btn">ボタン1</a>
+        <a href="button1.html" class="footer-btn"><img src="img/page1.png" alt="ボタン1"></a>
+        <a href="button2.html" class="footer-btn"><img src="img/page2.png" alt="ボタン2"></a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -205,13 +225,14 @@
             if (!el) return;
 
             const profile = getUserProfile();
+            const isImageIcon = profile.icon && profile.icon.startsWith('img/icons/');
             if (!profile.username) {
                 el.textContent = '';
                 return;
             }
 
-            const iconHtml = profile.icon
-                ? `<span class="user-icon">${profile.icon}</span>`
+            const iconHtml = isImageIcon
+                ? `<img class="user-icon" src="${profile.icon}" alt="ユーザーアイコン">`
                 : '';
 
             el.innerHTML =
@@ -234,6 +255,12 @@
         const showClubFalse = document.getElementById('showClubFalse');
         const hobbyButtons = document.querySelectorAll('#hobbyButtons .choice-button');
         const iconButtons = document.querySelectorAll('#iconButtons .icon-choice-button');
+
+        function isProfileComplete(profile) {
+            const username = (profile.username || '').trim();
+            const gender = (profile.gender || '').trim();
+            return !!(username && gender);
+        }
 
         function loadFormFromProfile() {
             const profile = getUserProfile();
@@ -353,9 +380,24 @@
             alert('設定を保存しました。');
         });
 
+        function attachFooterGuard() {
+            document.querySelectorAll('footer a.footer-btn').forEach((link) => {
+                const href = link.getAttribute('href') || '';
+                if (href === 'settings.html') return;
+                link.addEventListener('click', (e) => {
+                    const profile = getUserProfile();
+                    if (!isProfileComplete(profile)) {
+                        e.preventDefault();
+                        alert('先に設定ページでユーザーネームと性別を保存してください。');
+                    }
+                });
+            });
+        }
+
         // 初期表示
         loadFormFromProfile();
         applyHeaderProfile();
+        attachFooterGuard();
     </script>
 </body>
 </html>

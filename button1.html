@@ -20,7 +20,8 @@
     </main>
     
     <footer>
-        <a href="button1.html" class="footer-btn">ボタン1</a>
+        <a href="button1.html" class="footer-btn"><img src="img/page1.png" alt="ボタン1"></a>
+        <a href="button2.html" class="footer-btn"><img src="img/page2.png" alt="ボタン2"></a>
         <a href="team.html" class="footer-btn team-btn">👥</a>
         <a href="settings.html" class="footer-btn settings-btn">⚙️</a>
     </footer>
@@ -40,6 +41,12 @@
             return profile;
         }
 
+        function isProfileComplete(profile) {
+            const username = (profile.username || '').trim();
+            const gender = (profile.gender || '').trim();
+            return !!(username && gender);
+        }
+
         function applyHeaderProfile() {
             const el = document.getElementById('userNameDisplay');
             if (!el) return;
@@ -50,7 +57,12 @@
                 return;
             }
 
-            const iconHtml = profile.icon ? `<span class="user-icon">${profile.icon}</span>` : '';
+            const isImageIcon = profile.icon && (profile.icon.startsWith('img/') || profile.icon.match(/\.(png|jpg|jpeg|gif|webp)$/i));
+            const iconHtml = profile.icon
+                ? (isImageIcon
+                    ? `<img class="user-icon" src="${profile.icon}" alt="ユーザーアイコン">`
+                    : `<span class="user-icon">${profile.icon}</span>`)
+                : '';
             el.innerHTML =
                 `<span class="user-name-content">` +
                 iconHtml +
@@ -58,7 +70,32 @@
                 `</span>`;
         }
 
+        function enforceProfileOrRedirect() {
+            const profile = getUserProfile();
+            if (!isProfileComplete(profile)) {
+                alert('先に設定ページでユーザーネームと性別を保存してください。');
+                window.location.href = 'settings.html';
+            }
+        }
+
+        function attachFooterGuard() {
+            document.querySelectorAll('footer a.footer-btn').forEach((link) => {
+                const href = link.getAttribute('href') || '';
+                if (href === 'settings.html') return; // 設定へは許可
+                link.addEventListener('click', (e) => {
+                    const profile = getUserProfile();
+                    if (!isProfileComplete(profile)) {
+                        e.preventDefault();
+                        alert('先に設定ページでユーザーネームと性別を保存してください。');
+                        window.location.href = 'settings.html';
+                    }
+                });
+            });
+        }
+
+        enforceProfileOrRedirect();
         applyHeaderProfile();
+        attachFooterGuard();
 
         // ユーザーリストの表示
         function getAllUsers() {
@@ -68,6 +105,19 @@
                 return JSON.parse(raw);
             } catch (e) {
                 return [];
+            }
+        }
+
+        function saveAllUsers(users) {
+            localStorage.setItem('allUsers', JSON.stringify(users));
+        }
+
+        function removeBlockedUsers() {
+            const blockedUsernames = ['251205039', '1919810', 'test'];
+            const allUsers = getAllUsers();
+            const filtered = allUsers.filter(u => !blockedUsernames.includes(u.username));
+            if (filtered.length !== allUsers.length) {
+                saveAllUsers(filtered);
             }
         }
 
@@ -84,15 +134,24 @@
 
         function renderUsers() {
             const usersContainer = document.getElementById('usersContainer');
-            const users = getAllUsers();
             const currentUser = getUserProfile();
+            const users = getAllUsers();
+            const filterGender =
+                currentUser.gender === 'male'
+                    ? 'female'
+                    : currentUser.gender === 'female'
+                        ? 'male'
+                        : null;
+            const filteredUsers = filterGender
+                ? users.filter(u => (u.gender || '').trim() === filterGender)
+                : users;
             
-            if (users.length === 0) {
-                usersContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">登録されたユーザーはいません。</p>';
+            if (filteredUsers.length === 0) {
+                usersContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">表示できるユーザーがいません。</p>';
                 return;
             }
 
-            usersContainer.innerHTML = users.map(user => {
+            usersContainer.innerHTML = filteredUsers.map(user => {
                 const icon = user.icon || '';
                 const username = user.username || 'ユーザー名不明';
                 const department = user.department || '未設定';
@@ -150,6 +209,7 @@
             }).join('');
         }
 
+        removeBlockedUsers();
         renderUsers();
 
         // 初期ユーザーデータの登録（既に登録されている場合はスキップ）
@@ -222,7 +282,7 @@
             });
 
             if (updated) {
-                localStorage.setItem('allUsers', JSON.stringify(allUsers));
+                saveAllUsers(allUsers);
                 renderUsers();
             }
         }

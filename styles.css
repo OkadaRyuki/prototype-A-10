@@ -43,14 +43,13 @@ header h1 {
 }
 
 .user-icon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    object-fit: cover;
     background-color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
+    padding: 2px;
+    box-sizing: border-box;
 }
 
 main {
@@ -82,6 +81,12 @@ footer {
     align-items: center;
     justify-content: center;
     position: relative;
+}
+
+.footer-btn img {
+    height: 26px;
+    width: auto;
+    display: block;
 }
 
 .footer-btn:hover {
@@ -326,19 +331,24 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: 1px solid #ccc;
     background-color: #fff;
-    font-size: 20px;
     cursor: pointer;
 }
 
 .icon-choice-button.selected {
-    background-color: green;
-    color: #fff;
+    background-color: rgba(0, 128, 0, 0.1);
     border-color: green;
+}
+
+.icon-choice-button img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    border-radius: 50%;
 }
 
 .settings-save-button {
@@ -743,6 +753,77 @@ footer {
         grid-template-columns: 1fr;
         gap: 12px;
     }
+}
+
+/* イベント掲示板（button2.html）用スタイル */
+.events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.event-card {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 16px 16px 44px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.event-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.event-description {
+    margin: 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.event-join-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 16px;
+    border: none;
+    background-color: green;
+    color: #fff;
+    cursor: pointer;
+}
+
+.event-join-button:hover {
+    background-color: #006600;
+}
+
+.event-participants {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.event-participant-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.event-participant-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 
